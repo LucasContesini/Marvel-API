@@ -30,7 +30,7 @@ public class CharacterServiceImpl implements CharacterService {
     public CharacterDataContainer findWithFilter(Specification<Character> spec, int offset, int limit, String orderBy) {
         SearchServiceFactory<Character> searchServiceFactory = new SearchServiceFactory<>();
 
-        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy);
+        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy.toLowerCase());
         Page<Character> page = characterRepository.findAll(spec, pageable);
 
         List<Character> characterList = page.getContent();

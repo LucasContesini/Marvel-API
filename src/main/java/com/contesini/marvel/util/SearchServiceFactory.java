@@ -11,7 +11,7 @@ public class SearchServiceFactory<T> {
     private Class<T> clazz;
 
     public Pageable buildPageRequest(int offset, int limit, String orderBy) {
-        if (orderBy.isEmpty()) {
+        if (orderBy.isBlank()) {
             return PageRequest.of(offset, limit);
         }
         Sort.Direction direction = orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
