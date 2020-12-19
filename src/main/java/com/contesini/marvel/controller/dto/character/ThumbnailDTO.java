@@ -1,6 +1,7 @@
 package com.contesini.marvel.controller.dto.character;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;

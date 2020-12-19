@@ -1,21 +1,21 @@
-package com.contesini.marvel.model.character;
+package com.contesini.marvel.model.comic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
 
-@Entity(name = "url")
+@Entity(name = "text_object")
 @Data
-public class Url {
+public class TextObject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "type")
     private String type;
-    @Column(name = "url")
-    private String url;
+    private String language;
+    private String text;
+
     @JsonIgnore
     @ManyToOne
-    private Character character;
+    private Comic comic;
 }

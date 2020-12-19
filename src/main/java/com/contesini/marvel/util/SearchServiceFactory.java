@@ -5,6 +5,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class SearchServiceFactory<T> {
 
@@ -14,7 +17,17 @@ public class SearchServiceFactory<T> {
         if (orderBy.isBlank()) {
             return PageRequest.of(offset, limit);
         }
-        Sort.Direction direction = orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        return PageRequest.of(offset, limit, Sort.by(direction, orderBy.replace("-", "")));
+
+        List<Sort.Order> orders = new ArrayList<>();
+
+        String[] split = orderBy.split(",");
+
+        for (String s : split) {
+            Sort.Direction direction = s.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Sort.Order order = new Sort.Order(direction, s.replace("-", ""));
+            orders.add(order);
+        }
+
+        return PageRequest.of(offset, limit, Sort.by(orders));
     }
 }

@@ -1,10 +1,16 @@
 package com.contesini.marvel.model.character;
 
+import com.contesini.marvel.model.comic.Comic;
+import com.contesini.marvel.model.common.Thumbnail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "story")
 @Data
@@ -12,12 +18,25 @@ public class Story {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "collection_URI")
-    private String collectionURI;
+    private String title;
+    private String description;
+    @Column(name = "resource_URI")
+    private String resourceURI;
+    private String type;
+    private Date modified;
 
-    @OneToMany(mappedBy = "story")
-    private List<Item> items;
+    @OneToOne(mappedBy = "story")
+    private Thumbnail thumbnail;
+
+//    @JsonIgnore
+//    @ManyToMany
+//    @JoinTable(name = "story_comic",
+//            joinColumns = @JoinColumn(name = "story_id"),
+//            inverseJoinColumns = @JoinColumn(name = "comic_id"))
+//    private Set<Comic> comics;
+
+    @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore
-    @OneToOne
-    private Character character;
+    @ManyToMany(mappedBy = "stories")
+    Set<Character> characters;
 }

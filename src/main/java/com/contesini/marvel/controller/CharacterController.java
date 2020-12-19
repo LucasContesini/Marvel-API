@@ -9,8 +9,10 @@ import com.contesini.marvel.util.MessageUtil;
 import com.contesini.marvel.util.RequestParameterException;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
+import net.kaczmarzyk.spring.data.jpa.domain.In;
 import net.kaczmarzyk.spring.data.jpa.domain.StartingWithIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,11 +29,20 @@ public class CharacterController {
     private CharacterService characterService;
 
     @GetMapping
-    public ResponseEntity<DataWrapper> findWithFilter(@And({
-            @Spec(path = "name", params = "name", spec = EqualIgnoreCase.class),
-            @Spec(path = "name", params = "nameStartsWith", spec = StartingWithIgnoreCase.class),
-            @Spec(path = "modified", params = "modifiedSince", spec = Equal.class)
-    }) Specification<Character> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {
+    public ResponseEntity<DataWrapper> findWithFilter(
+            @Join(path = "comics", alias = "c")
+            @Join(path = "series", alias = "s")
+            @Join(path = "stories", alias = "st")
+            @Join(path = "events", alias = "e")
+            @And({
+                    @Spec(path = "name", params = "name", spec = EqualIgnoreCase.class),
+                    @Spec(path = "name", params = "nameStartsWith", spec = StartingWithIgnoreCase.class),
+                    @Spec(path = "modified", params = "modifiedSince", spec = Equal.class),
+                    @Spec(path = "c.id", params = "comics", paramSeparator = ',', spec = In.class),
+                    @Spec(path = "s.id", params = "series", paramSeparator = ',', spec = In.class),
+                    @Spec(path = "st.id", params = "stories", paramSeparator = ',', spec = In.class),
+                    @Spec(path = "e.id", params = "events", paramSeparator = ',', spec = In.class)
+            }) Specification<Character> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {
         try {
             checkLimit(limit);
             checkOffset(offset);
