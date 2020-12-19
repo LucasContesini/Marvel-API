@@ -28,10 +28,10 @@ public class DataConstructUtil {
         return wrapper;
     }
 
-    public static CharacterDataContainer constructContainer(List<CharacterDTO> characterDTOS) {
+    public static CharacterDataContainer constructContainer(List<CharacterDTO> characterDTOS, int count, int limit, int offset, int total) {
         CharacterDataContainer container = new CharacterDataContainer();
 
-        DataConstructUtil.addContainerInfo(container);
+        DataConstructUtil.addContainerInfo(container, count, limit, offset, total);
         container.setResults(characterDTOS);
 
         return container;
@@ -48,10 +48,10 @@ public class DataConstructUtil {
         wrapper.setAttributionHTML(DataConstructUtil.ATTRIBUTION_HTML);
     }
 
-    private static void addContainerInfo(DataContainer container) {
-        container.setCount(0);
-        container.setLimit(0);
-        container.setOffset(0);
-        container.setTotal(0);
+    private static void addContainerInfo(DataContainer container, int count, int limit, int offset, int total) {
+        container.setCount(count);
+        container.setLimit(limit);
+        container.setOffset(offset);
+        container.setTotal(total);
     }
 }

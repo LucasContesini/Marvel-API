@@ -3,7 +3,7 @@ package com.contesini.marvel.model.character;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity(name = "character")
@@ -16,7 +16,7 @@ public class Character {
     private String name;
     @Column(name = "description", length = 500)
     private String description;
-    private LocalDateTime modified;
+    private Date modified;
     @Column(name = "resource_URI")
     private String resourceURI;
 
