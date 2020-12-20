@@ -80,10 +80,10 @@ public class CharacterController {
     public ResponseEntity<DataWrapper> findComicsByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
+                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "title", params = "title", spec = EqualIgnoreCase.class),
                     @Spec(path = "title", params = "titleStartsWith", spec = StartingWithIgnoreCase.class),
                     @Spec(path = "format", params = "format", spec = EqualIgnoreCase.class),
-                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "startYear", params = "startYear", spec = Equal.class),
                     @Spec(path = "issueNumber", params = "issueNumber", spec = Equal.class),
                     @Spec(path = "diamondCode", params = "diamondCode", spec = Equal.class),
@@ -111,9 +111,9 @@ public class CharacterController {
     public ResponseEntity<DataWrapper> findEventsByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
+                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "title", params = "name", spec = EqualIgnoreCase.class),
                     @Spec(path = "title", params = "nameStartsWith", spec = StartingWithIgnoreCase.class),
-                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "modified", params = "modifiedSince", spec = Equal.class)
             }) Specification<Event> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {
         try {
@@ -133,9 +133,9 @@ public class CharacterController {
     public ResponseEntity<DataWrapper> findSeriesByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
+                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "title", params = "title", spec = EqualIgnoreCase.class),
                     @Spec(path = "title", params = "titleStartsWith", spec = StartingWithIgnoreCase.class),
-                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
                     @Spec(path = "startYear", params = "startYear", spec = Equal.class),
                     @Spec(path = "modified", params = "modifiedSince", spec = Equal.class)
             }) Specification<Series> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {

@@ -331,6 +331,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertCharacters(Set<Character> characters) {
+        if (characters == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(characters.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -349,6 +352,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertComics(Set<Comic> comics) {
+        if (comics == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(comics.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -367,6 +373,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertSeries(Set<Series> seriesSet) {
+        if (seriesSet == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(seriesSet.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -385,6 +394,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertStories(Set<Story> stories) {
+        if (stories == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(stories.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -404,6 +416,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertEvents(Set<Event> events) {
+        if (events == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(events.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -422,6 +437,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private ItemDetailsDTO convertCreators(Set<Creator> creators) {
+        if (creators == null) {
+            return null;
+        }
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(creators.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
@@ -451,6 +469,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private List<UrlDTO> convertUrls(List<Url> urls) {
+        if (urls == null) {
+            return null;
+        }
         List<UrlDTO> urlDTOS = new ArrayList<>();
 
         urls.forEach(url -> {
@@ -486,6 +507,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private List<TextObjectDTO> converTextObjects(List<TextObject> objects) {
+        if (objects == null) {
+            return null;
+        }
         List<TextObjectDTO> objectDTOS = new ArrayList<>();
 
         objects.forEach(object -> {
@@ -501,6 +525,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private List<ComicDateDTO> convertDates(List<ComicDate> dates) {
+        if (dates == null) {
+            return null;
+        }
         List<ComicDateDTO> dateDTOS = new ArrayList<>();
 
         dates.forEach(date -> {
@@ -515,6 +542,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private List<ComicPriceDTO> convertPrices(List<ComicPrice> prices) {
+        if (prices == null) {
+            return null;
+        }
         List<ComicPriceDTO> priceDTOS = new ArrayList<>();
 
         prices.forEach(price -> {
@@ -529,6 +559,9 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private List<ComicImageDTO> convertImages(List<ComicImage> images) {
+        if (images == null) {
+            return null;
+        }
         List<ComicImageDTO> comicImageDTOS = new ArrayList<>();
 
         images.forEach(image -> {
