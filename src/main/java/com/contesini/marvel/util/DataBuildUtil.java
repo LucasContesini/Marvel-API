@@ -1,6 +1,7 @@
 package com.contesini.marvel.util;
 
 import com.contesini.marvel.controller.dto.character.CharacterDTO;
+import com.contesini.marvel.controller.dto.comic.ComicDTO;
 import com.contesini.marvel.controller.dto.container.*;
 import com.contesini.marvel.controller.dto.event.EventDTO;
 import com.contesini.marvel.controller.dto.series.SeriesDTO;
@@ -65,6 +66,16 @@ public class DataBuildUtil {
         return wrapper;
     }
 
+    public static DataWrapper buildWrapper(ComicDataContainer container, HttpStatus status, String message) {
+        ComicDataWrapper wrapper = new ComicDataWrapper();
+
+        DataBuildUtil.addWrapperStatus(wrapper, status, message);
+        DataBuildUtil.addWrapperInfo(wrapper);
+        wrapper.setData(container);
+
+        return wrapper;
+    }
+
     public static CharacterDataContainer buildCharacterContainer(List<CharacterDTO> characterDTOS, int count, int limit, int offset, int total) {
         CharacterDataContainer container = new CharacterDataContainer();
 
@@ -97,6 +108,15 @@ public class DataBuildUtil {
 
         DataBuildUtil.addContainerInfo(container, count, limit, offset, total);
         container.setResults(seriesDTOS);
+
+        return container;
+    }
+
+    public static ComicDataContainer buildComicContainer(List<ComicDTO> comicDTOS, int count, int limit, int offset, int total) {
+        ComicDataContainer container = new ComicDataContainer();
+
+        DataBuildUtil.addContainerInfo(container, count, limit, offset, total);
+        container.setResults(comicDTOS);
 
         return container;
     }

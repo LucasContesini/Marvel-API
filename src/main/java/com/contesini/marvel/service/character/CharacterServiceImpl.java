@@ -1,26 +1,21 @@
 package com.contesini.marvel.service.character;
 
 import com.contesini.marvel.controller.dto.character.CharacterDTO;
+import com.contesini.marvel.controller.dto.comic.*;
 import com.contesini.marvel.controller.dto.common.ItemDTO;
 import com.contesini.marvel.controller.dto.common.ItemDetailsDTO;
 import com.contesini.marvel.controller.dto.common.ThumbnailDTO;
 import com.contesini.marvel.controller.dto.common.UrlDTO;
-import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
-import com.contesini.marvel.controller.dto.container.EventDataContainer;
-import com.contesini.marvel.controller.dto.container.SeriesDataContainer;
-import com.contesini.marvel.controller.dto.container.StoryDataContainer;
+import com.contesini.marvel.controller.dto.container.*;
 import com.contesini.marvel.controller.dto.event.EventDTO;
 import com.contesini.marvel.controller.dto.series.SeriesDTO;
 import com.contesini.marvel.controller.dto.story.StoryDTO;
 import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.model.character.*;
-import com.contesini.marvel.model.comic.Comic;
+import com.contesini.marvel.model.comic.*;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
-import com.contesini.marvel.repository.CharacterRepository;
-import com.contesini.marvel.repository.EventRepository;
-import com.contesini.marvel.repository.SeriesRepository;
-import com.contesini.marvel.repository.StoryRepository;
+import com.contesini.marvel.repository.*;
 import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.SearchServiceFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +40,8 @@ public class CharacterServiceImpl implements CharacterService {
     private EventRepository eventRepository;
     @Autowired
     private SeriesRepository seriesRepository;
+    @Autowired
+    private ComicRepository comicRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -111,6 +108,19 @@ public class CharacterServiceImpl implements CharacterService {
         List<SeriesDTO> seriesDTOS = series.stream().map(s -> convert(s)).collect(Collectors.toList());
 
         return DataBuildUtil.buildSeriesContainer(seriesDTOS, seriesDTOS.size(), limit, offset, (int) page.getTotalElements());
+    }
+
+    @Override
+    public ComicDataContainer findComicsByCharacterId(Specification<Comic> spec, int offset, int limit, String orderBy) {
+        SearchServiceFactory<Story> searchServiceFactory = new SearchServiceFactory<>();
+
+        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy.toLowerCase());
+        Page<Comic> page = comicRepository.findAll(spec, pageable);
+
+        List<Comic> comics = page.getContent();
+        List<ComicDTO> comicDTOS = comics.stream().map(c -> convert(c)).collect(Collectors.toList());
+
+        return DataBuildUtil.buildComicContainer(comicDTOS, comicDTOS.size(), limit, offset, (int) page.getTotalElements());
     }
 
     private CharacterDTO convert(Character character) {
@@ -268,6 +278,58 @@ public class CharacterServiceImpl implements CharacterService {
         }
     }
 
+    private ComicDTO convert(Comic comic) {
+        ComicDTO comicDTO = new ComicDTO();
+        comicDTO.setId(comic.getId());
+        comicDTO.setDigitalId(comic.getDigitalId());
+        comicDTO.setTitle(comic.getTitle());
+        comicDTO.setDescription(comic.getDescription());
+        comicDTO.setVariantDescription(comic.getVariantDescription());
+        comicDTO.setDiamondCode(comic.getDiamondCode());
+        comicDTO.setEan(comic.getEan());
+        comicDTO.setFormat(comic.getFormat());
+        comicDTO.setIsbn(comic.getIsbn());
+        comicDTO.setIssn(comic.getIssn());
+        comicDTO.setUpc(comic.getUpc());
+        comicDTO.setIssueNumber(comic.getIssueNumber());
+        comicDTO.setModified(comic.getModified());
+        comicDTO.setPageCount(comic.getPageCount());
+        comicDTO.setResourceURI(comic.getResourceURI());
+
+        comicDTO.setThumbnail(convertThumbnail(comic.getThumbnail()));
+        comicDTO.setUrls(convertUrls(comic.getUrls()));
+
+        Set<Character> characters = comic.getCharacters();
+
+        List<Set<Series>> listSeries = characters.stream().map(c -> c.getSeries()).collect(Collectors.toList());
+        if (listSeries.size() > 0) {
+            comicDTO.setSeries(convertSeries(listSeries.get(0)));
+        }
+
+        List<Set<Event>> listEvents = characters.stream().map(e -> e.getEvents()).collect(Collectors.toList());
+        if (listEvents.size() > 0) {
+            comicDTO.setEvents(convertEvents(listEvents.get(0)));
+        }
+
+        List<Set<Story>> listStories = characters.stream().map(c -> c.getStories()).collect(Collectors.toList());
+        if (listStories.size() > 0) {
+            comicDTO.setStories(convertStories(listStories.get(0)));
+        }
+        comicDTO.setCharacters(convertCharacters(characters));
+
+        Set<Creator> listCreator = comic.getCreators();
+        if (listCreator.size() > 0) {
+            comicDTO.setCreators(convertCreators(listCreator));
+        }
+
+        comicDTO.setTextObjects(converTextObjects(comic.getTextObjects()));
+        comicDTO.setDates(convertDates(comic.getComicDates()));
+        comicDTO.setPrices(convertPrices(comic.getComicPrices()));
+        comicDTO.setImages(convertImages(comic.getComicImages()));
+
+        return comicDTO;
+    }
+
     private ItemDetailsDTO convertCharacters(Set<Character> characters) {
         ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(characters.size());
@@ -421,5 +483,62 @@ public class CharacterServiceImpl implements CharacterService {
         itemDTO.setResourceURI(series.getResourceURI());
 
         return itemDTO;
+    }
+
+    private List<TextObjectDTO> converTextObjects(List<TextObject> objects) {
+        List<TextObjectDTO> objectDTOS = new ArrayList<>();
+
+        objects.forEach(object -> {
+            TextObjectDTO objectDTO = new TextObjectDTO();
+            objectDTO.setLanguage(object.getLanguage());
+            objectDTO.setText(object.getText());
+            objectDTO.setType(object.getType());
+
+            objectDTOS.add(objectDTO);
+        });
+
+        return objectDTOS;
+    }
+
+    private List<ComicDateDTO> convertDates(List<ComicDate> dates) {
+        List<ComicDateDTO> dateDTOS = new ArrayList<>();
+
+        dates.forEach(date -> {
+            ComicDateDTO comicDateDTO = new ComicDateDTO();
+            comicDateDTO.setDate(date.getDate());
+            comicDateDTO.setType(date.getType());
+
+            dateDTOS.add(comicDateDTO);
+        });
+
+        return dateDTOS;
+    }
+
+    private List<ComicPriceDTO> convertPrices(List<ComicPrice> prices) {
+        List<ComicPriceDTO> priceDTOS = new ArrayList<>();
+
+        prices.forEach(price -> {
+            ComicPriceDTO comicPriceDTO = new ComicPriceDTO();
+            comicPriceDTO.setPrice(price.getPrice());
+            comicPriceDTO.setType(price.getType());
+
+            priceDTOS.add(comicPriceDTO);
+        });
+
+        return priceDTOS;
+    }
+
+    private List<ComicImageDTO> convertImages(List<ComicImage> images) {
+        List<ComicImageDTO> comicImageDTOS = new ArrayList<>();
+
+        images.forEach(image -> {
+            ComicImageDTO comicImageDTO = new ComicImageDTO();
+            comicImageDTO.setExtension(image.getExtension());
+            comicImageDTO.setPath(image.getPath());
+
+            comicImageDTOS.add(comicImageDTO);
+        });
+
+        return comicImageDTOS;
     }
 }

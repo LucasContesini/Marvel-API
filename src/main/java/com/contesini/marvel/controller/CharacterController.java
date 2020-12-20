@@ -1,14 +1,12 @@
 package com.contesini.marvel.controller;
 
-import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
-import com.contesini.marvel.controller.dto.container.EventDataContainer;
-import com.contesini.marvel.controller.dto.container.SeriesDataContainer;
-import com.contesini.marvel.controller.dto.container.StoryDataContainer;
+import com.contesini.marvel.controller.dto.container.*;
 import com.contesini.marvel.controller.dto.wrapper.DataWrapper;
 import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.model.character.Event;
 import com.contesini.marvel.model.character.Series;
 import com.contesini.marvel.model.character.Story;
+import com.contesini.marvel.model.comic.Comic;
 import com.contesini.marvel.service.character.CharacterService;
 import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.MessageUtil;
@@ -75,6 +73,37 @@ public class CharacterController {
             return ResponseEntity.ok(DataBuildUtil.buildWrapper(container, HttpStatus.OK, null));
         } catch (RequestParameterException ex) {
             return ResponseEntity.status(ex.getStatus()).body(DataBuildUtil.buildWrapper(ex.getStatus(), ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{characterId}/comics")
+    public ResponseEntity<DataWrapper> findComicsByCharacterId(
+            @Join(path = "characters", alias = "c")
+            @And({
+                    @Spec(path = "title", params = "title", spec = EqualIgnoreCase.class),
+                    @Spec(path = "title", params = "titleStartsWith", spec = StartingWithIgnoreCase.class),
+                    @Spec(path = "format", params = "format", spec = EqualIgnoreCase.class),
+                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
+                    @Spec(path = "startYear", params = "startYear", spec = Equal.class),
+                    @Spec(path = "issueNumber", params = "issueNumber", spec = Equal.class),
+                    @Spec(path = "diamondCode", params = "diamondCode", spec = Equal.class),
+                    @Spec(path = "digitalId", params = "digitalId", spec = Equal.class),
+                    @Spec(path = "upc", params = "upc", spec = Equal.class),
+                    @Spec(path = "isbn", params = "isbn", spec = Equal.class),
+                    @Spec(path = "ean", params = "ean", spec = Equal.class),
+                    @Spec(path = "issn", params = "issn", spec = Equal.class),
+                    @Spec(path = "modified", params = "modifiedSince", spec = Equal.class)
+            }) Specification<Comic> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {
+        try {
+            checkLimit(limit);
+            checkOffset(offset);
+
+            ComicDataContainer container = characterService.findComicsByCharacterId(spec, offset, limit, orderBy);
+            return ResponseEntity.ok(DataBuildUtil.buildWrapper(container, HttpStatus.OK, null));
+        } catch (RequestParameterException ex) {
+            return ResponseEntity.status(ex.getStatus()).body(DataBuildUtil.buildWrapper(ex.getStatus(), ex.getMessage()));
+        } catch (PropertyReferenceException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(DataBuildUtil.buildWrapper(HttpStatus.CONFLICT, ex.getPropertyName() + MessageUtil.ORDER_PARAMETER_INVALID));
         }
     }
 

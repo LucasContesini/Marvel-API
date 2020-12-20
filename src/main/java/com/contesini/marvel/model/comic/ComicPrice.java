@@ -12,7 +12,7 @@ public class ComicPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String type;
-    private Date date;
+    private Float price;
 
     @ManyToOne
     private Comic comic;
