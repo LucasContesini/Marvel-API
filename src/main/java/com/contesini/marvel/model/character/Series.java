@@ -1,12 +1,9 @@
 package com.contesini.marvel.model.character;
 
-import com.contesini.marvel.model.comic.Comic;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,7 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "series")
-@Data
+@Getter
+@Setter
 public class Series {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +29,18 @@ public class Series {
     private List<Url> urls;
     @OneToOne(mappedBy = "series")
     private Thumbnail thumbnail;
+    @JsonIgnore
+    @ManyToOne
+    private Series previous;
+    @JsonIgnore
+    @ManyToOne
+    private Series next;
+
+    @OneToMany(mappedBy = "previous")
+    private List<Series> previousSeries;
+    @OneToMany(mappedBy = "next")
+    private List<Series> nextSeries;
+
 
     @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore

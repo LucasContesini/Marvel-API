@@ -7,8 +7,10 @@ import com.contesini.marvel.controller.dto.common.ThumbnailDTO;
 import com.contesini.marvel.controller.dto.common.UrlDTO;
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
 import com.contesini.marvel.controller.dto.container.EventDataContainer;
+import com.contesini.marvel.controller.dto.container.SeriesDataContainer;
 import com.contesini.marvel.controller.dto.container.StoryDataContainer;
 import com.contesini.marvel.controller.dto.event.EventDTO;
+import com.contesini.marvel.controller.dto.series.SeriesDTO;
 import com.contesini.marvel.controller.dto.story.StoryDTO;
 import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.model.character.*;
@@ -17,6 +19,7 @@ import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.contesini.marvel.repository.CharacterRepository;
 import com.contesini.marvel.repository.EventRepository;
+import com.contesini.marvel.repository.SeriesRepository;
 import com.contesini.marvel.repository.StoryRepository;
 import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.SearchServiceFactory;
@@ -40,6 +43,8 @@ public class CharacterServiceImpl implements CharacterService {
     private StoryRepository storyRepository;
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private SeriesRepository seriesRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -91,7 +96,21 @@ public class CharacterServiceImpl implements CharacterService {
 
         List<Event> events = page.getContent();
         List<EventDTO> eventsDTOs = events.stream().map(e -> convert(e)).collect(Collectors.toList());
+
         return DataBuildUtil.buildEventContainer(eventsDTOs, eventsDTOs.size(), limit, offset, (int) page.getTotalElements());
+    }
+
+    @Override
+    public SeriesDataContainer findSeriesByCharacterId(Specification<Series> spec, int offset, int limit, String orderBy) {
+        SearchServiceFactory<Story> searchServiceFactory = new SearchServiceFactory<>();
+
+        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy.toLowerCase());
+        Page<Series> page = seriesRepository.findAll(spec, pageable);
+
+        List<Series> series = page.getContent();
+        List<SeriesDTO> seriesDTOS = series.stream().map(s -> convert(s)).collect(Collectors.toList());
+
+        return DataBuildUtil.buildSeriesContainer(seriesDTOS, seriesDTOS.size(), limit, offset, (int) page.getTotalElements());
     }
 
     private CharacterDTO convert(Character character) {
@@ -197,6 +216,53 @@ public class CharacterServiceImpl implements CharacterService {
             eventDTO.setNext(convertEventToItem(event.getNext()));
 
             return eventDTO;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private SeriesDTO convert(Series series) {
+        try {
+            SeriesDTO seriesDTO = new SeriesDTO();
+            seriesDTO.setId(series.getId());
+            seriesDTO.setTitle(series.getTitle());
+            seriesDTO.setDescription(series.getDescription());
+            seriesDTO.setEndYear(series.getEndYear());
+            seriesDTO.setStartYear(series.getStartYear());
+            seriesDTO.setModified(series.getModified());
+            seriesDTO.setRating(series.getRating());
+            seriesDTO.setResourceURI(series.getResourceURI());
+
+            seriesDTO.setThumbnail(convertThumbnail(series.getThumbnail()));
+            seriesDTO.setUrls(convertUrls(series.getUrls()));
+
+            Set<Character> characters = series.getCharacters();
+
+            List<Set<Comic>> listComic = characters.stream().map(c -> c.getComics()).collect(Collectors.toList());
+            if (listComic.size() > 0) {
+                seriesDTO.setComics(convertComics(listComic.get(0)));
+            }
+
+            List<Set<Event>> listEvents = characters.stream().map(e -> e.getEvents()).collect(Collectors.toList());
+            if (listEvents.size() > 0) {
+                seriesDTO.setEvents(convertEvents(listEvents.get(0)));
+            }
+
+            List<Set<Story>> listStories = characters.stream().map(c -> c.getStories()).collect(Collectors.toList());
+            if (listStories.size() > 0) {
+                seriesDTO.setStories(convertStories(listStories.get(0)));
+            }
+            seriesDTO.setCharacters(convertCharacters(characters));
+
+            List<Set<Creator>> listCreator = listComic.get(0).stream().map(c -> c.getCreators()).collect(Collectors.toList());
+            if (listCreator.size() > 0) {
+                seriesDTO.setCreators(convertCreators(listCreator.get(0)));
+            }
+
+            seriesDTO.setPrevious(convertSeriesToItem(series.getPrevious()));
+            seriesDTO.setNext(convertSeriesToItem(series.getNext()));
+
+            return seriesDTO;
         } catch (Exception e) {
             return null;
         }
@@ -342,6 +408,17 @@ public class CharacterServiceImpl implements CharacterService {
         ItemDTO itemDTO = new ItemDTO();
         itemDTO.setName(event.getTitle());
         itemDTO.setResourceURI(event.getResourceURI());
+
+        return itemDTO;
+    }
+
+    private ItemDTO convertSeriesToItem(Series series) {
+        if (series == null) {
+            return null;
+        }
+        ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setName(series.getTitle());
+        itemDTO.setResourceURI(series.getResourceURI());
 
         return itemDTO;
     }

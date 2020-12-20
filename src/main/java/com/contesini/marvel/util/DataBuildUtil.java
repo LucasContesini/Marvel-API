@@ -1,16 +1,11 @@
 package com.contesini.marvel.util;
 
 import com.contesini.marvel.controller.dto.character.CharacterDTO;
-import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
-import com.contesini.marvel.controller.dto.container.DataContainer;
-import com.contesini.marvel.controller.dto.container.EventDataContainer;
-import com.contesini.marvel.controller.dto.container.StoryDataContainer;
+import com.contesini.marvel.controller.dto.container.*;
 import com.contesini.marvel.controller.dto.event.EventDTO;
+import com.contesini.marvel.controller.dto.series.SeriesDTO;
 import com.contesini.marvel.controller.dto.story.StoryDTO;
-import com.contesini.marvel.controller.dto.wrapper.CharacterDataWrapper;
-import com.contesini.marvel.controller.dto.wrapper.DataWrapper;
-import com.contesini.marvel.controller.dto.wrapper.EventDataWrapper;
-import com.contesini.marvel.controller.dto.wrapper.StoryDataWrapper;
+import com.contesini.marvel.controller.dto.wrapper.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -60,6 +55,16 @@ public class DataBuildUtil {
         return wrapper;
     }
 
+    public static DataWrapper buildWrapper(SeriesDataContainer container, HttpStatus status, String message) {
+        SeriesDataWrapper wrapper = new SeriesDataWrapper();
+
+        DataBuildUtil.addWrapperStatus(wrapper, status, message);
+        DataBuildUtil.addWrapperInfo(wrapper);
+        wrapper.setData(container);
+
+        return wrapper;
+    }
+
     public static CharacterDataContainer buildCharacterContainer(List<CharacterDTO> characterDTOS, int count, int limit, int offset, int total) {
         CharacterDataContainer container = new CharacterDataContainer();
 
@@ -83,6 +88,15 @@ public class DataBuildUtil {
 
         DataBuildUtil.addContainerInfo(container, count, limit, offset, total);
         container.setResults(eventDTOS);
+
+        return container;
+    }
+
+    public static SeriesDataContainer buildSeriesContainer(List<SeriesDTO> seriesDTOS, int count, int limit, int offset, int total) {
+        SeriesDataContainer container = new SeriesDataContainer();
+
+        DataBuildUtil.addContainerInfo(container, count, limit, offset, total);
+        container.setResults(seriesDTOS);
 
         return container;
     }

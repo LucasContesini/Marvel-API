@@ -21,10 +21,17 @@ INSERT INTO `character_comic` (comic_id, character_id) VALUES
 INSERT INTO `series` (description, end_year, start_year, modified, rating, resource_URI, title) VALUES
 ('description', 2020, 2019, '2020-02-01', 'rating', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title'),
 ('description2', 2020, 2019, '2020-01-10', 'rating2', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title2'),
-('description3', 2020, 2019, '2020-01-15', 'rating3', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title3');
+('description3', 2020, 2019, '2020-01-15', 'rating3', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title3'),
+('description4', 2021, 2020, '2020-10-15', 'rating4', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title4');
+
+UPDATE `series` SET previous_id = 1 WHERE id = 2;
+UPDATE `series` SET previous_id = 2 WHERE id = 3;
+UPDATE `series` SET next_id = 2 WHERE id = 1;
+UPDATE `series` SET next_id = 3 WHERE id = 2;
 
 INSERT INTO `character_series` (character_id, series_id) VALUES
 (1, 1),
+(1, 4),
 (2, 2),
 (3, 3);
 
@@ -55,22 +62,28 @@ INSERT INTO `character_event` (character_id, event_id) VALUES
 (2, 2),
 (3, 3);
 
-INSERT INTO `thumbnail` (path, extension, character_id, event_id) VALUES
-('http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784', 'jpg', 1, null),
-('http://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16', 'jpg', 2, null),
-('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', 3, null),
-('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 1),
-('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 2),
-('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 3);
+INSERT INTO `thumbnail` (path, extension, character_id, event_id, series_id) VALUES
+('http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784', 'jpg', 1, null, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16', 'jpg', 2, null, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', 3, null, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 1, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 2, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, 3, null),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, null, 1),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, null, 2),
+('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', null, null, 3);
 
-INSERT INTO `url` (type, url, character_id, event_id) VALUES
-('detail', 'http://marvel.com/characters/74/3-d_man?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 1, null),
-('wiki', 'http://marvel.com/universe/3-D_Man_(Chandler)?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 1, null),
-('detail', 'http://marvel.com/characters/76/a-bomb?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 2, null),
-('comiclink', 'http://marvel.com/comics/characters/1017100/a-bomb_has?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 2, null),
-('detail', 'http://marvel.com/characters/77/aim.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 3, null),
-('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 3, null),
-('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 1),
-('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 1),
-('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 2),
-('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 3);
+INSERT INTO `url` (type, url, character_id, event_id, series_id) VALUES
+('detail', 'http://marvel.com/characters/74/3-d_man?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 1, null, null),
+('wiki', 'http://marvel.com/universe/3-D_Man_(Chandler)?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 1, null, null),
+('detail', 'http://marvel.com/characters/76/a-bomb?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 2, null, null),
+('comiclink', 'http://marvel.com/comics/characters/1017100/a-bomb_has?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 2, null, null),
+('detail', 'http://marvel.com/characters/77/aim.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 3, null, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', 3, null, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 1, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 1, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 2, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, 3, null),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, null, 1),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, null, 2),
+('wiki', 'http://marvel.com/universe/A.I.M.?utm_campaign=apiRef&utm_source=67cfd5006b16b8f43fad2a87bf79d002', null, null, 3);

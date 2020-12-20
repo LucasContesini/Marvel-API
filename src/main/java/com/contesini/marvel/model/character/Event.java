@@ -3,9 +3,7 @@ package com.contesini.marvel.model.character;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,7 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "event")
-@Data
+@Getter
+@Setter
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
