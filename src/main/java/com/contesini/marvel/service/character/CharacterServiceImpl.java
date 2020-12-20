@@ -6,14 +6,17 @@ import com.contesini.marvel.controller.dto.common.ItemDetailsDTO;
 import com.contesini.marvel.controller.dto.common.ThumbnailDTO;
 import com.contesini.marvel.controller.dto.common.UrlDTO;
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
+import com.contesini.marvel.controller.dto.container.EventDataContainer;
 import com.contesini.marvel.controller.dto.container.StoryDataContainer;
+import com.contesini.marvel.controller.dto.event.EventDTO;
 import com.contesini.marvel.controller.dto.story.StoryDTO;
-import com.contesini.marvel.model.character.*;
 import com.contesini.marvel.model.character.Character;
+import com.contesini.marvel.model.character.*;
 import com.contesini.marvel.model.comic.Comic;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.contesini.marvel.repository.CharacterRepository;
+import com.contesini.marvel.repository.EventRepository;
 import com.contesini.marvel.repository.StoryRepository;
 import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.SearchServiceFactory;
@@ -35,6 +38,8 @@ public class CharacterServiceImpl implements CharacterService {
     private CharacterRepository characterRepository;
     @Autowired
     private StoryRepository storyRepository;
+    @Autowired
+    private EventRepository eventRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -77,6 +82,18 @@ public class CharacterServiceImpl implements CharacterService {
         return DataBuildUtil.buildStoryContainer(storiesDTOs, storiesDTOs.size(), limit, offset, (int) page.getTotalElements());
     }
 
+    @Override
+    public EventDataContainer findEventsByCharacterId(Specification<Event> spec, int offset, int limit, String orderBy) {
+        SearchServiceFactory<Story> searchServiceFactory = new SearchServiceFactory<>();
+
+        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy.toLowerCase());
+        Page<Event> page = eventRepository.findAll(spec, pageable);
+
+        List<Event> events = page.getContent();
+        List<EventDTO> eventsDTOs = events.stream().map(e -> convert(e)).collect(Collectors.toList());
+        return DataBuildUtil.buildEventContainer(eventsDTOs, eventsDTOs.size(), limit, offset, (int) page.getTotalElements());
+    }
+
     private CharacterDTO convert(Character character) {
         try {
             CharacterDTO characterDTO = new CharacterDTO();
@@ -113,20 +130,73 @@ public class CharacterServiceImpl implements CharacterService {
             Set<Character> characters = story.getCharacters();
 
             List<Set<Comic>> listComic = characters.stream().map(c -> c.getComics()).collect(Collectors.toList());
-            storyDTO.setComics(convertComics(listComic.get(0)));
+            if (listComic.size() > 0) {
+                storyDTO.setComics(convertComics(listComic.get(0)));
+            }
 
             List<Set<Series>> listSeries = characters.stream().map(c -> c.getSeries()).collect(Collectors.toList());
-            storyDTO.setSeries(convertSeries(listSeries.get(0)));
+            if (listSeries.size() > 0) {
+                storyDTO.setSeries(convertSeries(listSeries.get(0)));
+            }
 
             List<Set<Event>> listEvents = characters.stream().map(c -> c.getEvents()).collect(Collectors.toList());
-            storyDTO.setEvents(convertEvents(listEvents.get(0)));
+            if (listEvents.size() > 0) {
+                storyDTO.setEvents(convertEvents(listEvents.get(0)));
+            }
 
             storyDTO.setCharacters(convertCharacters(characters));
 
             List<Set<Creator>> listCreator = listComic.get(0).stream().map(c -> c.getCreators()).collect(Collectors.toList());
-            storyDTO.setCreators(convertCreators(listCreator.get(0)));
-
+            if (listCreator.size() > 0) {
+                storyDTO.setCreators(convertCreators(listCreator.get(0)));
+            }
             return storyDTO;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private EventDTO convert(Event event) {
+        try {
+            EventDTO eventDTO = new EventDTO();
+            eventDTO.setId(event.getId());
+            eventDTO.setDescription(event.getDescription());
+            eventDTO.setTitle(event.getTitle());
+            eventDTO.setEnd(event.getEnd());
+            eventDTO.setStart(event.getStart());
+            eventDTO.setModified(event.getModified());
+            eventDTO.setResourceURI(event.getResourceURI());
+
+            eventDTO.setThumbnail(convertThumbnail(event.getThumbnail()));
+            eventDTO.setUrls(convertUrls(event.getUrls()));
+
+            Set<Character> characters = event.getCharacters();
+
+            List<Set<Comic>> listComic = characters.stream().map(c -> c.getComics()).collect(Collectors.toList());
+            if (listComic.size() > 0) {
+                eventDTO.setComics(convertComics(listComic.get(0)));
+            }
+
+            List<Set<Series>> listSeries = characters.stream().map(c -> c.getSeries()).collect(Collectors.toList());
+            if (listSeries.size() > 0) {
+                eventDTO.setSeries(convertSeries(listSeries.get(0)));
+            }
+
+            List<Set<Story>> listStories = characters.stream().map(c -> c.getStories()).collect(Collectors.toList());
+            if (listStories.size() > 0) {
+                eventDTO.setStories(convertStories(listStories.get(0)));
+            }
+            eventDTO.setCharacters(convertCharacters(characters));
+
+            List<Set<Creator>> listCreator = listComic.get(0).stream().map(c -> c.getCreators()).collect(Collectors.toList());
+            if (listCreator.size() > 0) {
+                eventDTO.setCreators(convertCreators(listCreator.get(0)));
+            }
+
+            eventDTO.setPrevious(convertEventToItem(event.getPrevious()));
+            eventDTO.setNext(convertEventToItem(event.getNext()));
+
+            return eventDTO;
         } catch (Exception e) {
             return null;
         }
@@ -263,5 +333,16 @@ public class CharacterServiceImpl implements CharacterService {
             urlDTOS.add(urlDTO);
         });
         return urlDTOS;
+    }
+
+    private ItemDTO convertEventToItem(Event event) {
+        if (event == null) {
+            return null;
+        }
+        ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setName(event.getTitle());
+        itemDTO.setResourceURI(event.getResourceURI());
+
+        return itemDTO;
     }
 }

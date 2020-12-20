@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Entity(name = "event")
 @Data
-public class    Event {
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,6 +25,17 @@ public class    Event {
     private Date modified;
     private Date start;
     private Date end;
+    @JsonIgnore
+    @ManyToOne
+    private Event previous;
+    @JsonIgnore
+    @ManyToOne
+    private Event next;
+
+    @OneToMany(mappedBy = "previous")
+    private List<Event> previousEvents;
+    @OneToMany(mappedBy = "next")
+    private List<Event> nextEvents;
 
     @OneToMany(mappedBy = "event")
     private List<Url> urls;
