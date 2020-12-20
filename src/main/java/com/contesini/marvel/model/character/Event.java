@@ -1,6 +1,5 @@
 package com.contesini.marvel.model.character;
 
-import com.contesini.marvel.model.comic.Comic;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,7 +14,7 @@ import java.util.Set;
 
 @Entity(name = "event")
 @Data
-public class Event {
+public class    Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -31,13 +30,6 @@ public class Event {
     private List<Url> urls;
     @OneToOne(mappedBy = "event")
     private Thumbnail thumbnail;
-
-//    @JsonIgnore
-//    @ManyToMany
-//    @JoinTable(name = "event_comic",
-//            joinColumns = @JoinColumn(name = "event_id"),
-//            inverseJoinColumns = @JoinColumn(name = "comic_id"))
-//    private Set<Comic> comics;
 
     @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore

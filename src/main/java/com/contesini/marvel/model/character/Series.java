@@ -32,13 +32,6 @@ public class Series {
     @OneToOne(mappedBy = "series")
     private Thumbnail thumbnail;
 
-//    @JsonIgnore
-//    @ManyToMany
-//    @JoinTable(name = "series_comic",
-//            joinColumns = @JoinColumn(name = "series_id"),
-//            inverseJoinColumns = @JoinColumn(name = "comic_id"))
-//    private Set<Comic> comics;
-
     @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore
     @ManyToMany(mappedBy = "series")

@@ -5,9 +5,7 @@ import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,7 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "comic")
-@Data
+@Getter
+@Setter
 public class Comic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,18 +49,8 @@ public class Comic {
     @OneToMany(mappedBy = "comic")
     private List<ComicImage> comicImages;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "comics")
     Set<Creator> creators;
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "comics")
-//    Set<Event> events;
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "comics")
-//    Set<Story> stories;
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "comics")
-//    Set<Series> series;
     @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore
     @ManyToMany(mappedBy = "comics")

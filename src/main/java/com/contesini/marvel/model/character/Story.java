@@ -9,7 +9,6 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "story")
@@ -27,13 +26,6 @@ public class Story {
 
     @OneToOne(mappedBy = "story")
     private Thumbnail thumbnail;
-
-//    @JsonIgnore
-//    @ManyToMany
-//    @JoinTable(name = "story_comic",
-//            joinColumns = @JoinColumn(name = "story_id"),
-//            inverseJoinColumns = @JoinColumn(name = "comic_id"))
-//    private Set<Comic> comics;
 
     @EqualsAndHashCode.Exclude @ToString.Exclude
     @JsonIgnore

@@ -1,4 +1,4 @@
-package com.contesini.marvel.controller.dto.character;
+package com.contesini.marvel.controller.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

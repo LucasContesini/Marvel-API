@@ -1,12 +1,15 @@
 package com.contesini.marvel.controller;
 
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
+import com.contesini.marvel.controller.dto.container.StoryDataContainer;
 import com.contesini.marvel.controller.dto.wrapper.DataWrapper;
 import com.contesini.marvel.model.character.Character;
+import com.contesini.marvel.model.character.Story;
 import com.contesini.marvel.service.character.CharacterService;
-import com.contesini.marvel.util.DataConstructUtil;
+import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.MessageUtil;
 import com.contesini.marvel.util.RequestParameterException;
+import lombok.EqualsAndHashCode;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.domain.In;
@@ -48,11 +51,11 @@ public class CharacterController {
             checkOffset(offset);
 
             CharacterDataContainer container = characterService.findWithFilter(spec, offset, limit, orderBy);
-            return ResponseEntity.ok(DataConstructUtil.constructWrapper(container, HttpStatus.OK, null));
+            return ResponseEntity.ok(DataBuildUtil.buildWrapper(container, HttpStatus.OK, null));
         } catch (RequestParameterException ex) {
-            return ResponseEntity.status(ex.getStatus()).body(DataConstructUtil.constructWrapper(null, ex.getStatus(), ex.getMessage()));
+            return ResponseEntity.status(ex.getStatus()).body(DataBuildUtil.buildWrapper(ex.getStatus(), ex.getMessage()));
         } catch (PropertyReferenceException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(DataConstructUtil.constructWrapper(null, HttpStatus.CONFLICT, ex.getPropertyName() + MessageUtil.ORDER_PARAMETER_INVALID));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(DataBuildUtil.buildWrapper(HttpStatus.CONFLICT, ex.getPropertyName() + MessageUtil.ORDER_PARAMETER_INVALID));
         }
     }
 
@@ -64,11 +67,31 @@ public class CharacterController {
 
             CharacterDataContainer container = characterService.findById(characterId, offset, limit);
             if (container.getResults().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(DataConstructUtil.constructWrapper(container, HttpStatus.NOT_FOUND, MessageUtil.CHARACTER_NOT_FOUND));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(DataBuildUtil.buildWrapper(container, HttpStatus.NOT_FOUND, MessageUtil.CHARACTER_NOT_FOUND));
             }
-            return ResponseEntity.ok(DataConstructUtil.constructWrapper(container, HttpStatus.OK, null));
+            return ResponseEntity.ok(DataBuildUtil.buildWrapper(container, HttpStatus.OK, null));
         } catch (RequestParameterException ex) {
-            return ResponseEntity.status(ex.getStatus()).body(DataConstructUtil.constructWrapper(null, ex.getStatus(), ex.getMessage()));
+            return ResponseEntity.status(ex.getStatus()).body(DataBuildUtil.buildWrapper(ex.getStatus(), ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{characterId}/stories")
+    public ResponseEntity<DataWrapper> findStoriesByCharacterId(
+            @Join(path = "characters", alias = "c")
+            @And({
+                    @Spec(path = "c.id", pathVars = "characterId", spec = Equal.class),
+                    @Spec(path = "modified", params = "modifiedSince", spec = Equal.class)
+            }) Specification<Story> spec, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset, @RequestParam(value = "orderBy", defaultValue = "", required = false) String orderBy) {
+        try {
+            checkLimit(limit);
+            checkOffset(offset);
+
+            StoryDataContainer container = characterService.findStoriesByCharacterId(spec, offset, limit, orderBy);
+            return ResponseEntity.ok(DataBuildUtil.buildWrapper(container, HttpStatus.OK, null));
+        } catch (RequestParameterException ex) {
+            return ResponseEntity.status(ex.getStatus()).body(DataBuildUtil.buildWrapper(ex.getStatus(), ex.getMessage()));
+        } catch (PropertyReferenceException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(DataBuildUtil.buildWrapper(HttpStatus.CONFLICT, ex.getPropertyName() + MessageUtil.ORDER_PARAMETER_INVALID));
         }
     }
 

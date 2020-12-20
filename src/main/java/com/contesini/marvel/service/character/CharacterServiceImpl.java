@@ -1,16 +1,21 @@
 package com.contesini.marvel.service.character;
 
-import com.contesini.marvel.controller.dto.character.*;
+import com.contesini.marvel.controller.dto.character.CharacterDTO;
+import com.contesini.marvel.controller.dto.common.ItemDTO;
+import com.contesini.marvel.controller.dto.common.ItemDetailsDTO;
+import com.contesini.marvel.controller.dto.common.ThumbnailDTO;
+import com.contesini.marvel.controller.dto.common.UrlDTO;
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
+import com.contesini.marvel.controller.dto.container.StoryDataContainer;
+import com.contesini.marvel.controller.dto.story.StoryDTO;
+import com.contesini.marvel.model.character.*;
 import com.contesini.marvel.model.character.Character;
-import com.contesini.marvel.model.character.Event;
-import com.contesini.marvel.model.character.Series;
-import com.contesini.marvel.model.character.Story;
 import com.contesini.marvel.model.comic.Comic;
 import com.contesini.marvel.model.common.Thumbnail;
 import com.contesini.marvel.model.common.Url;
 import com.contesini.marvel.repository.CharacterRepository;
-import com.contesini.marvel.util.DataConstructUtil;
+import com.contesini.marvel.repository.StoryRepository;
+import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.SearchServiceFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,8 @@ public class CharacterServiceImpl implements CharacterService {
     @Autowired
     private CharacterRepository characterRepository;
     @Autowired
+    private StoryRepository storyRepository;
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Override
@@ -41,20 +48,33 @@ public class CharacterServiceImpl implements CharacterService {
         List<Character> characterList = page.getContent();
         List<CharacterDTO> characterDTOS = characterList.stream().map(c -> convert(c)).collect(Collectors.toList());
 
-        return DataConstructUtil.constructContainer(characterDTOS, characterDTOS.size(), limit, offset, (int) page.getTotalElements());
+        return DataBuildUtil.buildCharacterContainer(characterDTOS, characterDTOS.size(), limit, offset, (int) page.getTotalElements());
     }
 
     @Override
     public CharacterDataContainer findById(int id, int offset, int limit) {
         Optional<Character> optionalCharacter = characterRepository.findById(id);
         if (optionalCharacter.isEmpty()) {
-            return DataConstructUtil.constructContainer(Collections.emptyList(), 0, limit, offset, 0);
+            return DataBuildUtil.buildCharacterContainer(Collections.emptyList(), 0, limit, offset, 0);
         }
 
         Character character = optionalCharacter.get();
         List<CharacterDTO> characterList = Collections.singletonList(convert(character));
 
-        return DataConstructUtil.constructContainer(characterList, characterList.size(), 0, 0, characterList.size());
+        return DataBuildUtil.buildCharacterContainer(characterList, characterList.size(), 0, 0, characterList.size());
+    }
+
+    @Override
+    public StoryDataContainer findStoriesByCharacterId(Specification<Story> spec, int offset, int limit, String orderBy) {
+        SearchServiceFactory<Story> searchServiceFactory = new SearchServiceFactory<>();
+
+        Pageable pageable = searchServiceFactory.buildPageRequest(offset, limit, orderBy.toLowerCase());
+        Page<Story> page = storyRepository.findAll(spec, pageable);
+
+        List<Story> stories = page.getContent();
+        List<StoryDTO> storiesDTOs = stories.stream().map(s -> convert(s)).collect(Collectors.toList());
+
+        return DataBuildUtil.buildStoryContainer(storiesDTOs, storiesDTOs.size(), limit, offset, (int) page.getTotalElements());
     }
 
     private CharacterDTO convert(Character character) {
@@ -79,8 +99,59 @@ public class CharacterServiceImpl implements CharacterService {
         }
     }
 
-    private CharacterDetailsDTO convertComics(Set<Comic> comics) {
-        CharacterDetailsDTO detailsDTO = new CharacterDetailsDTO();
+    private StoryDTO convert(Story story) {
+        try {
+            StoryDTO storyDTO = new StoryDTO();
+            storyDTO.setId(story.getId());
+            storyDTO.setTitle(story.getTitle());
+            storyDTO.setModified(story.getModified());
+            storyDTO.setType(story.getType());
+            storyDTO.setThumbnail(convertThumbnail(story.getThumbnail()));
+            storyDTO.setResourceURI(story.getResourceURI());
+            storyDTO.setDescription(story.getDescription());
+
+            Set<Character> characters = story.getCharacters();
+
+            List<Set<Comic>> listComic = characters.stream().map(c -> c.getComics()).collect(Collectors.toList());
+            storyDTO.setComics(convertComics(listComic.get(0)));
+
+            List<Set<Series>> listSeries = characters.stream().map(c -> c.getSeries()).collect(Collectors.toList());
+            storyDTO.setSeries(convertSeries(listSeries.get(0)));
+
+            List<Set<Event>> listEvents = characters.stream().map(c -> c.getEvents()).collect(Collectors.toList());
+            storyDTO.setEvents(convertEvents(listEvents.get(0)));
+
+            storyDTO.setCharacters(convertCharacters(characters));
+
+            List<Set<Creator>> listCreator = listComic.get(0).stream().map(c -> c.getCreators()).collect(Collectors.toList());
+            storyDTO.setCreators(convertCreators(listCreator.get(0)));
+
+            return storyDTO;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private ItemDetailsDTO convertCharacters(Set<Character> characters) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
+        detailsDTO.setReturned(characters.size());
+        detailsDTO.setAvailable(detailsDTO.getReturned());
+        List<ItemDTO> items = new ArrayList<>();
+        characters.forEach(character -> {
+            if (detailsDTO.getCollectionURI() == null) {
+                detailsDTO.setCollectionURI(character.getResourceURI());
+            }
+            ItemDTO item = new ItemDTO();
+            item.setName(character.getName());
+            item.setResourceURI(BASE_COLLECTION_URI + "/characters/" + character.getId());
+            items.add(item);
+        });
+        detailsDTO.setItems(items);
+        return detailsDTO;
+    }
+
+    private ItemDetailsDTO convertComics(Set<Comic> comics) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(comics.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
         List<ItemDTO> items = new ArrayList<>();
@@ -97,8 +168,8 @@ public class CharacterServiceImpl implements CharacterService {
         return detailsDTO;
     }
 
-    private CharacterDetailsDTO convertSeries(Set<Series> seriesSet) {
-        CharacterDetailsDTO detailsDTO = new CharacterDetailsDTO();
+    private ItemDetailsDTO convertSeries(Set<Series> seriesSet) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(seriesSet.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
         List<ItemDTO> items = new ArrayList<>();
@@ -115,8 +186,8 @@ public class CharacterServiceImpl implements CharacterService {
         return detailsDTO;
     }
 
-    private CharacterDetailsDTO convertStories(Set<Story> stories) {
-        CharacterDetailsDTO detailsDTO = new CharacterDetailsDTO();
+    private ItemDetailsDTO convertStories(Set<Story> stories) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(stories.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
         List<ItemDTO> items = new ArrayList<>();
@@ -134,8 +205,8 @@ public class CharacterServiceImpl implements CharacterService {
         return detailsDTO;
     }
 
-    private CharacterDetailsDTO convertEvents(Set<Event> events) {
-        CharacterDetailsDTO detailsDTO = new CharacterDetailsDTO();
+    private ItemDetailsDTO convertEvents(Set<Event> events) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
         detailsDTO.setReturned(events.size());
         detailsDTO.setAvailable(detailsDTO.getReturned());
         List<ItemDTO> items = new ArrayList<>();
@@ -152,8 +223,27 @@ public class CharacterServiceImpl implements CharacterService {
         return detailsDTO;
     }
 
+    private ItemDetailsDTO convertCreators(Set<Creator> creators) {
+        ItemDetailsDTO detailsDTO = new ItemDetailsDTO();
+        detailsDTO.setReturned(creators.size());
+        detailsDTO.setAvailable(detailsDTO.getReturned());
+        List<ItemDTO> items = new ArrayList<>();
+        creators.forEach(creator -> {
+            if (detailsDTO.getCollectionURI() == null) {
+                detailsDTO.setCollectionURI(creator.getResourceURI());
+            }
+            ItemDTO item = new ItemDTO();
+            item.setName(creator.getName());
+            item.setRole(creator.getRole());
+            item.setResourceURI(BASE_COLLECTION_URI + "/creators/" + creator.getId());
+            items.add(item);
+        });
+        detailsDTO.setItems(items);
+        return detailsDTO;
+    }
+
     private ThumbnailDTO convertThumbnail(Thumbnail thumbnail) {
-        if(thumbnail == null) {
+        if (thumbnail == null) {
             return null;
         }
         ThumbnailDTO thumbnailDTO = new ThumbnailDTO();

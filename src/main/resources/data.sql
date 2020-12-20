@@ -1,6 +1,13 @@
 INSERT INTO `comic` (description, diamond_code, digital_id, ean, format, isbn, issn, issue_number, modified, page_count, resource_URI, title, upc, variant_description) VALUES
 ('description', '123', 123, 'ean', 'format', 'isbn', 'issn', 10, '2020-01-01', 123, 'http://gateway.marvel.com/v1/public/characters/1011334/comics', 'title', 'upc', 'variantDescription');
 
+INSERT INTO `creator` (name, role, resource_URI) VALUES
+('name', 'role', 'http://gateway.marvel.com/v1/public/stories/47184/creators'),
+('name2', 'role2', 'http://gateway.marvel.com/v1/public/stories/47184/creators');
+
+INSERT INTO `creator_comic` (creator_id, comic_id) VALUES
+(1, 1),
+(2, 1);
 
 INSERT INTO `character` (name, description, modified, resource_URI) VALUES
 ('3-D Man', '', '2014-04-29', 'http://gateway.marvel.com/v1/public/characters/1011334'),
@@ -12,9 +19,9 @@ INSERT INTO `character_comic` (comic_id, character_id) VALUES
 (1, 2);
 
 INSERT INTO `series` (description, end_year, start_year, modified, rating, resource_URI, title) VALUES
-('description', 2020, 2019, '2020-01-01', 'rating', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title'),
-('description', 2020, 2019, '2020-01-01', 'rating', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title'),
-('description', 2020, 2019, '2020-01-01', 'rating', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title');
+('description', 2020, 2019, '2020-02-01', 'rating', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title'),
+('description2', 2020, 2019, '2020-01-10', 'rating2', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title2'),
+('description3', 2020, 2019, '2020-01-15', 'rating3', 'http://gateway.marvel.com/v1/public/characters/1011334/series', 'title3');
 
 INSERT INTO `character_series` (character_id, series_id) VALUES
 (1, 1),
@@ -27,13 +34,13 @@ INSERT INTO `thumbnail` (path, extension, character_id) VALUES
 ('http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec', 'jpg', 3);
 
 INSERT INTO `story` (description, modified, resource_URI, title, type) VALUES
-('description', '2020-01-10', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title', 'type'),
-('description', '2020-01-10', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title', 'type'),
-('description', '2020-01-10', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title', 'type');
+('description', '2020-02-10', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title', 'type'),
+('description2', '2020-01-11', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title2', 'type2'),
+('description3', '2020-01-15', 'http://gateway.marvel.com/v1/public/characters/1011334/stories', 'title3', 'type3');
 
 INSERT INTO `character_story` (character_id, story_id) VALUES
 (1, 1),
-(2, 2),
+(1, 2),
 (3, 3);
 
 INSERT INTO `event` (description, `end`, start, modified, resource_URI, title) VALUES
