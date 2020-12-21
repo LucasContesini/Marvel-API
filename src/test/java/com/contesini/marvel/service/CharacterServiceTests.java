@@ -1,7 +1,7 @@
 package com.contesini.marvel.service;
 
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
-import com.contesini.marvel.mock.BaseMockConfigTest;
+import com.contesini.marvel.mock.BaseServiceMockConfigTest;
 import com.contesini.marvel.mock.CharacterMock;
 import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.repository.CharacterRepository;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class CharacterServiceTests extends BaseMockConfigTest {
+public class CharacterServiceTests extends BaseServiceMockConfigTest {
 
     @Autowired
     private CharacterService characterService;
@@ -27,7 +27,7 @@ public class CharacterServiceTests extends BaseMockConfigTest {
     private CharacterRepository characterRepository;
 
     @Test
-    public void shouldReturnCharacterContainerWithOneCharacter() {
+    public void shouldReturnCharacterContainerWithOneCharacterWhenFindExistentCharacterId() {
         Optional<Character> optionalCharacterMock = CharacterMock.createOptionalCharacterMock();
 
         doReturn(optionalCharacterMock).when(characterRepository).findById(CharacterMock.EXISTENT_CHARACTER_ID);
@@ -39,7 +39,7 @@ public class CharacterServiceTests extends BaseMockConfigTest {
     }
 
     @Test
-    public void shouldReturnCharacterContainerWithNoCharacter() {
+    public void shouldReturnCharacterContainerWithNoCharacterWhenFindNoExistentCharacterId() {
         final int SIZE = 0;
 
         Optional<Character> optionalCharacterMock = CharacterMock.createEmptyOptionalCharacterMock();

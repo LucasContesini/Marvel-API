@@ -1,5 +1,6 @@
 package com.contesini.marvel.service.character;
 
+import com.contesini.marvel.controller.dto.character.CharacterDTO;
 import com.contesini.marvel.controller.dto.container.*;
 import com.contesini.marvel.model.character.Character;
 import com.contesini.marvel.model.character.Event;

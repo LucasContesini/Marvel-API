@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
 @SpringBootTest
 @Transactional
 @Rollback
-public abstract class BaseMockConfigTest {
+public abstract class BaseServiceMockConfigTest {
     @MockBean
     private CharacterRepository characterRepository;
 }

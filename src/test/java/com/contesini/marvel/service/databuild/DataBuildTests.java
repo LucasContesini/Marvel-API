@@ -4,7 +4,7 @@ import com.contesini.marvel.controller.dto.character.CharacterDTO;
 import com.contesini.marvel.controller.dto.container.CharacterDataContainer;
 import com.contesini.marvel.controller.dto.wrapper.CharacterDataWrapper;
 import com.contesini.marvel.controller.dto.wrapper.DataWrapper;
-import com.contesini.marvel.mock.BaseMockConfigTest;
+import com.contesini.marvel.mock.BaseServiceMockConfigTest;
 import com.contesini.marvel.util.DataBuildUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class DataBuildTests extends BaseMockConfigTest {
+public class DataBuildTests extends BaseServiceMockConfigTest {
 
 
     @Test
