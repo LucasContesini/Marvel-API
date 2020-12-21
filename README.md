@@ -6,6 +6,11 @@ Projeto que replica a API da Marvel. Usando banco de dados H2, populando as info
 
 ## Instalação e Execução
 
+### Requisitos
+
+* Java 11
+
+
 Docker:
 
 ```sh
