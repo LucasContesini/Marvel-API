@@ -11,6 +11,7 @@ import com.contesini.marvel.service.character.CharacterService;
 import com.contesini.marvel.util.DataBuildUtil;
 import com.contesini.marvel.util.MessageUtil;
 import com.contesini.marvel.util.RequestParameterException;
+import io.swagger.annotations.ApiOperation;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.domain.In;
@@ -32,7 +33,9 @@ public class CharacterController {
     @Autowired
     private CharacterService characterService;
 
+
     @GetMapping
+    @ApiOperation(value = "Filter Character", notes = "Filtering characters")
     public ResponseEntity<DataWrapper> findWithFilter(
             @Join(path = "comics", alias = "c")
             @Join(path = "series", alias = "s")
@@ -61,6 +64,7 @@ public class CharacterController {
     }
 
     @GetMapping("/{characterId}")
+    @ApiOperation(value = "Find Character", notes = "Find character by id")
     public ResponseEntity<DataWrapper> findById(@PathVariable int characterId, @RequestParam(value = "limit", defaultValue = "20", required = false) int limit, @RequestParam(value = "offset", defaultValue = "0", required = false) int offset) {
         try {
             checkLimit(limit);
@@ -77,6 +81,7 @@ public class CharacterController {
     }
 
     @GetMapping("/{characterId}/comics")
+    @ApiOperation(value = "Filter Comic", notes = "Filtering comics")
     public ResponseEntity<DataWrapper> findComicsByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
@@ -108,6 +113,7 @@ public class CharacterController {
     }
 
     @GetMapping("/{characterId}/events")
+    @ApiOperation(value = "Filter Event", notes = "Filtering events")
     public ResponseEntity<DataWrapper> findEventsByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
@@ -130,6 +136,7 @@ public class CharacterController {
     }
 
     @GetMapping("/{characterId}/series")
+    @ApiOperation(value = "Filter Series", notes = "Filtering series")
     public ResponseEntity<DataWrapper> findSeriesByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
@@ -153,6 +160,7 @@ public class CharacterController {
     }
 
     @GetMapping("/{characterId}/stories")
+    @ApiOperation(value = "Filter Story", notes = "Filtering stories")
     public ResponseEntity<DataWrapper> findStoriesByCharacterId(
             @Join(path = "characters", alias = "c")
             @And({
