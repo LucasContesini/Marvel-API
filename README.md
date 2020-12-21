@@ -17,8 +17,8 @@ docker run -p 9190:9190 marvel
 Console/Jar:
 
 ```sh
-cd .\target\
 mvn clean package
+cd .\target\
 java -jar marvel-0.0.1-SNAPSHOT.jar
 ```
 
